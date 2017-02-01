@@ -60,8 +60,8 @@ class Handler extends Actor with ActorLogging {
     val dataIngestionResponses = dataSource.mapAsync(parallelism = maxOpenRequests)(createRequestFn)
     val hotObservable = dataIngestionResponses.publish
 
-    hotObservable.subscribe()
     cancelable = hotObservable.connect()
+    // hotObservable.subscribe(???) if needed. In this case we are just logging (Task[Unit])
   }
 
   override def postStop(): Unit = {
