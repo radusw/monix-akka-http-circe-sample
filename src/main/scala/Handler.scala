@@ -8,7 +8,8 @@ import monix.reactive.OverflowStrategy.Unbounded
 import monix.reactive._
 import monix.reactive.subjects.ConcurrentSubject
 
-import scala.util.{Failure, Random, Success, Try}
+import scala.concurrent.duration._
+import scala.util.{Failure, Random, Success}
 
 
 class Handler extends Actor with ActorLogging {
@@ -73,27 +74,44 @@ class Handler extends Actor with ActorLogging {
       ticksSubject.onNext(userRequest).onComplete(_ => ())
   }
 
-  private val createRequestFn = (item: (HttpRequest, RequestContext)) => {
-    Try(Http().singleRequest(item._1)).fold(failure => { log.error(s"EMS: $failure"); Task.unit}, { sendF =>
-      val task = Task.deferFuture(sendF).materialize
-      task.map {
-        case Success(response) =>
-          if (response.status != StatusCodes.OK)
-            log.warning(s"${item._2}: " + response.toString)
-          else if (item._2.requestNo == item._2.totalNumberOfRequests - 1)
-            log.info(s"Done sending data (100%)...; Last one: ${item._2}")
-          else if (item._2.requestNo % (item._2.totalNumberOfRequests / 20) == 0) { // log every 5% progress
-            val progressPercentage = item._2.requestNo * 100 / (item._2.totalNumberOfRequests - 1)
-            log.info(s"Sending data ($progressPercentage%)...; Current one: ${item._2}")
-          }
-          else
-            ()
-          response.discardEntityBytes()
-          ()
+  private def retryBackoff[A](
+    source: Task[A],
+    maxRetries: Int,
+    firstDelay: FiniteDuration,
+    context: RequestContext): Task[A] = {
 
-        case Failure(ex) => log.warning(s"Err: $ex")
-      }
-    })
+    source.onErrorHandleWith {
+      case ex: Exception =>
+        if (maxRetries > 0) {
+          log.info(s"$context: $ex: Retrying (${maxRetries - 1})... ")
+          retryBackoff(source, maxRetries - 1, firstDelay * 2, context)
+            .delayExecution(firstDelay)
+        }
+        else
+          Task.raiseError(ex)
+    }
+  }
+
+  private val createRequestFn = (item: (HttpRequest, RequestContext)) => {
+    val task = Task.deferFuture(Http().singleRequest(item._1).transform{t => println("request"); t})
+    val taskWithExponentialBackoff = retryBackoff(task, 5, 2.seconds, item._2)
+    taskWithExponentialBackoff.materialize.map {
+      case Success(response) =>
+        if (response.status != StatusCodes.OK)
+          log.warning(s"${item._2}: " + response.toString)
+        else if (item._2.requestNo == item._2.totalNumberOfRequests - 1)
+          log.info(s"Done sending data (100%)...; Last one: ${item._2}")
+        else if (item._2.requestNo % (item._2.totalNumberOfRequests / 20) == 0) { // log every 5% progress
+          val progressPercentage = item._2.requestNo * 100 / (item._2.totalNumberOfRequests - 1)
+          log.info(s"Sending data ($progressPercentage%)...; Current one: ${item._2}")
+        }
+        else
+          ()
+        response.discardEntityBytes()
+        ()
+
+      case Failure(ex) => log.warning(s"Err: $ex")
+    }
   }
 }
 
