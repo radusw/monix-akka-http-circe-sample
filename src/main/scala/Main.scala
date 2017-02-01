@@ -43,4 +43,5 @@ object AppConfig {
   private val httpConfig: Config = config.getConfig("http")
   val httpInterface: String = httpConfig.getString("interface")
   val httpPort: Int = httpConfig.getInt("port")
+  val exampleEndpoint = config.getString("endpoint")
 }

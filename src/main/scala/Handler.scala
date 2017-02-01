@@ -41,7 +41,7 @@ class Handler extends Actor with ActorLogging {
       i += 1
       HttpRequest(
         method = HttpMethods.GET,
-        uri = Uri("http://jsonplaceholder.typicode.com/posts"),
+        uri = Uri(AppConfig.exampleEndpoint),
         entity = HttpEntity(
           ContentTypes.`application/json`,
           batch.asJson.toString.getBytes(java.nio.charset.StandardCharsets.UTF_8)
