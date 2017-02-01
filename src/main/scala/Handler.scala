@@ -93,7 +93,7 @@ class Handler extends Actor with ActorLogging {
   }
 
   private val createRequestFn = (item: (HttpRequest, RequestContext)) => {
-    val task = Task.deferFuture(Http().singleRequest(item._1).transform{t => println("request"); t})
+    val task = Task.deferFuture(Http().singleRequest(item._1))
     val taskWithExponentialBackoff = retryBackoff(task, 5, 2.seconds, item._2)
     taskWithExponentialBackoff.materialize.map {
       case Success(response) =>
