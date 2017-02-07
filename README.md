@@ -18,3 +18,14 @@ You should see:
 2017-02-01T02:41:17.279+0100 [my-system-akka.actor.default-dispatcher-3] INFO  Handler - Sending data (95%)...; Current one: RequestContext(950,1000)
 2017-02-01T02:41:19.007+0100 [my-system-akka.actor.default-dispatcher-25] INFO  Handler - Done sending data (100%)...; Last one: RequestContext(999,1000)
 ```
+
+### Dockerized
+```
+$sbt docker:publishLocal
+$docker run -d -p 9000:9000 --restart unless-stopped --name monix-akka-http radusw/monix-akka-http-client:1.0
+
+$docker exec -it monix-akka-http sh
+/ # tail -f /logs/application.log
+
+$curl http://localhost:9000/tick
+```

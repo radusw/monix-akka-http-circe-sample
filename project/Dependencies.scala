@@ -11,6 +11,7 @@ object Dependencies {
   val timeV      = "2.16.0"
   val monixV     = "2.2.1"
 
+  lazy val projectResolvers = Seq.empty
   lazy val dependencies = testDependencies ++ rootDependencies
 
 
