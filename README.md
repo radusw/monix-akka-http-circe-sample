@@ -24,8 +24,7 @@ You should see:
 $sbt docker:publishLocal
 $docker run -d -p 9000:9000 --restart unless-stopped --name monix-akka-http radusw/monix-akka-http-client:1.0
 
-$docker exec -it monix-akka-http sh
-/ # tail -f /logs/application.log
+$docker logs monix-akka-http --follow
 
 $curl http://localhost:9000/tick
 ```
