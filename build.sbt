@@ -82,7 +82,7 @@ lazy val dockerSettings = Seq(
     Cmd("FROM", "alpine:3.3"),
     Cmd("RUN apk upgrade --update && apk add --update openjdk8-jre"),
     Cmd("ADD", "opt /opt"),
-    ExecCmd("ENTRYPOINT", "/opt/monix-akka-http-client/bin/monix-akka-http-client")
+    ExecCmd("ENTRYPOINT", "/opt/monix-akka-http-client/bin/monix-akka-http-client -Dlogger.resource=logback.docker.xml -Dpidfile.path=/dev/null")
   ),
   dockerExposedPorts := Seq(9000),
 
