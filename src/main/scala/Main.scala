@@ -10,7 +10,7 @@ import scala.util.Try
 
 object Main extends App {
   Try(args(0)).foreach(appConfigFile => System.setProperty("config.file", appConfigFile))
-  Try(args(1)).foreach(logConfigFile => System.setProperty("logback.configurationFile", logConfigFile))
+  if (!AppConfig.logToFile) System.setProperty("logback.configurationFile", "logback.stdout.xml")
 
   import system.dispatcher
 
@@ -48,4 +48,5 @@ object AppConfig {
   val httpInterface: String = httpConfig.getString("interface")
   val httpPort: Int = httpConfig.getInt("port")
   val exampleEndpoint = config.getString("endpoint")
+  val logToFile = config.getBoolean("log.to.file")
 }

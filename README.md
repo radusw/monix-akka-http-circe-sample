@@ -6,7 +6,7 @@ An example/template of using Monix (https://monix.io/) for limiting the number o
 ```
 $sbt run
 or
-$sbt "run conf/prod.conf conf/logback.docker.xml"
+$sbt "run conf/prod.conf"
 
 $curl http://localhost:9000/tick
 ```

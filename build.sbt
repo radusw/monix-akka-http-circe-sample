@@ -99,8 +99,8 @@ lazy val dockerSettings = Seq(
     Cmd("RUN apk upgrade --update && apk add --update openjdk8-jre"),
     Cmd("ADD", "opt /opt"),
     Cmd("WORKDIR", "/opt/monix-akka-http-client"),
-    // Cmd("CMD", "java", "-cp", "'lib/*'", "-Dpidfile.path=/dev/null", "Main", "conf/prod.conf", "conf/logback.docker.xml")
-    ExecCmd("ENTRYPOINT", "bin/monix-akka-http-client", "conf/prod.conf", "conf/logback.docker.xml")
+    // Cmd("CMD", "java", "-cp", "'lib/*'", "-Dpidfile.path=/dev/null", "Main", "conf/docker.conf")
+    ExecCmd("ENTRYPOINT", "bin/monix-akka-http-client", "conf/docker.conf")
   ),
   dockerExposedPorts := Seq(9000),
 
