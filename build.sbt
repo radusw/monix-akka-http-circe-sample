@@ -5,7 +5,7 @@ import Dependencies._
 lazy val root = (project in file("."))
   .settings(commonSettings)
   .settings(dockerSettings)
-  .enablePlugins(AshScriptPlugin)
+  .enablePlugins(AshScriptPlugin, UniversalDeployPlugin)
 
 lazy val commonSettings = Seq(
   organization := "eu.radusw",
@@ -20,7 +20,22 @@ lazy val commonSettings = Seq(
   fork in testOnly := true,
   connectInput in run := true,
   javaOptions in run ++= forkedJvmOption,
-  javaOptions in Test ++= forkedJvmOption
+  javaOptions in Test ++= forkedJvmOption,
+  mappings in Universal ++= (baseDirectory.value / "conf" * "*").get.map(x => x -> ("conf/" + x.getName)),
+  javaOptions in Universal ++= Seq(
+    "-server",
+    "-Dfile.encoding=UTF8",
+    "-Duser.timezone=UTC",
+    "-Dpidfile.path=/dev/null",
+    "-J-Xss1m",
+    "-J-XX:+CMSClassUnloadingEnabled",
+    "-J-XX:ReservedCodeCacheSize=256m",
+    "-J-XX:+DoEscapeAnalysis",
+    "-J-XX:+UseConcMarkSweepGC",
+    "-J-XX:+UseParNewGC",
+    "-J-XX:+UseCodeCacheFlushing",
+    "-J-XX:+UseCompressedOops"
+  )
 )
 
 
@@ -77,12 +92,15 @@ lazy val forkedJvmOption = Seq(
 
 
 lazy val dockerSettings = Seq(
+  dockerUpdateLatest := true,
   defaultLinuxInstallLocation in Docker := "/opt/monix-akka-http-client",
   dockerCommands := Seq(
-    Cmd("FROM", "alpine:3.3"),
+    Cmd("FROM", "alpine:latest"),
     Cmd("RUN apk upgrade --update && apk add --update openjdk8-jre"),
     Cmd("ADD", "opt /opt"),
-    ExecCmd("ENTRYPOINT", "/opt/monix-akka-http-client/bin/monix-akka-http-client -Dlogger.resource=logback.docker.xml -Dpidfile.path=/dev/null")
+    Cmd("WORKDIR", "/opt/monix-akka-http-client"),
+    // Cmd("CMD", "java", "-cp", "'lib/*'", "-Dpidfile.path=/dev/null", "Main", "conf/prod.conf", "conf/logback.docker.xml")
+    ExecCmd("ENTRYPOINT", "bin/monix-akka-http-client", "conf/prod.conf", "conf/logback.docker.xml")
   ),
   dockerExposedPorts := Seq(9000),
 

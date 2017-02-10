@@ -6,8 +6,12 @@ import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
 
 import scala.io.StdIn
+import scala.util.Try
 
 object Main extends App {
+  Try(args(0)).foreach(appConfigFile => System.setProperty("config.file", appConfigFile))
+  Try(args(1)).foreach(logConfigFile => System.setProperty("logback.configurationFile", logConfigFile))
+
   import system.dispatcher
 
   implicit val system: ActorSystem = ActorSystem("my-system")
@@ -26,7 +30,7 @@ object Main extends App {
 
   val bindingFuture = Http().bindAndHandle(route, AppConfig.httpInterface, AppConfig.httpPort)
 
-  log.info(s"Server online. Type `exit` to stop...")
+  log.info(s"Server up at ${AppConfig.httpInterface}:${AppConfig.httpPort}. Type `exit` to stop...")
   var continue = true
   while (continue) {
     val c = StdIn.readLine()

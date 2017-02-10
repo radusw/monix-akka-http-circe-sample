@@ -3,8 +3,13 @@ An example/template of using Monix (https://monix.io/) for limiting the number o
 
 
 ### To see it in action
-$curl http://localhost:9000/tick
+```
+$sbt run
+or
+$sbt "run conf/prod.conf conf/logback.docker.xml"
 
+$curl http://localhost:9000/tick
+```
 
 You should see:
 
