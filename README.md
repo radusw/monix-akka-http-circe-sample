@@ -14,7 +14,7 @@ $curl http://localhost:9000/tick
 You should see:
 
 ```
-2017-02-01T02:40:29.015+0100 [my-system-akka.actor.default-dispatcher-2] INFO  Main$ - Server online. Type `exit` to stop...
+2017-02-01T02:40:29.015+0100 [my-system-akka.actor.default-dispatcher-2] INFO  Main$ - Server up at 0.0.0.0:9000
 2017-02-01T02:40:31.885+0100 [my-system-akka.actor.default-dispatcher-15] INFO  Handler - Sending data (0%)...; Current one: RequestContext(0,1000)
 2017-02-01T02:40:34.459+0100 [my-system-akka.actor.default-dispatcher-7] INFO  Handler - Sending data (5%)...; Current one: RequestContext(50,1000)
 2017-02-01T02:40:36.483+0100 [my-system-akka.actor.default-dispatcher-11] INFO  Handler - Sending data (10%)...; Current one: RequestContext(100,1000)
