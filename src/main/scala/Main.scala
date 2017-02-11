@@ -5,7 +5,6 @@ import akka.http.scaladsl.server.Directives._
 import akka.stream.ActorMaterializer
 import com.typesafe.config.{Config, ConfigFactory}
 
-import scala.io.StdIn
 import scala.util.Try
 
 object Main extends App {
@@ -30,16 +29,14 @@ object Main extends App {
 
   val bindingFuture = Http().bindAndHandle(route, AppConfig.httpInterface, AppConfig.httpPort)
 
-  log.info(s"Server up at ${AppConfig.httpInterface}:${AppConfig.httpPort}. Type `exit` to stop...")
-  var continue = true
-  while (continue) {
-    val c = StdIn.readLine()
-    continue = c != "exit"
-  }
-
-  bindingFuture
-    .flatMap(_.unbind())
-    .onComplete(_ => system.terminate())
+  log.info(s"Server up at ${AppConfig.httpInterface}:${AppConfig.httpPort}")
+  Runtime.getRuntime.addShutdownHook(new Thread() {
+    override def run(): Unit = {
+      bindingFuture
+        .flatMap(_.unbind())
+        .onComplete(_ => system.terminate())
+    }
+  })
 }
 
 object AppConfig {
