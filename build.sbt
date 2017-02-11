@@ -5,7 +5,7 @@ import Dependencies._
 lazy val root = (project in file("."))
   .settings(commonSettings)
   .settings(dockerSettings)
-  .enablePlugins(AshScriptPlugin, UniversalDeployPlugin)
+  .enablePlugins(AshScriptPlugin)
 
 lazy val commonSettings = Seq(
   organization := "eu.radusw",
