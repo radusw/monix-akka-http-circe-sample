@@ -1,4 +1,4 @@
-# monix-akka-http-circe-example
+# monix-akka-http-circe-sample
 An example/template of using Monix (https://monix.io/) for limiting the number of simultaneous requests sent (using akka-http client) to an endpoint
 
 
