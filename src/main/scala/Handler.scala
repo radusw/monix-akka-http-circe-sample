@@ -41,7 +41,7 @@ class Handler extends Actor with ActorLogging {
     val ingestionRequests = timeSeries.map { batch =>
       i += 1
       HttpRequest(
-        method = HttpMethods.GET,
+        method = HttpMethods.POST,
         uri = Uri(AppConfig.exampleEndpoint),
         entity = HttpEntity(
           ContentTypes.`application/json`,
@@ -97,7 +97,7 @@ class Handler extends Actor with ActorLogging {
     val taskWithExponentialBackoff = retryBackoff(task, 5, 2.seconds, item._2)
     taskWithExponentialBackoff.materialize.map {
       case Success(response) =>
-        if (response.status != StatusCodes.OK)
+        if (response.status.intValue / 100 != 2 /*e.g. StatusCodes.Created*/)
           log.warning(s"${item._2}: " + response.toString)
         else if (item._2.requestNo == item._2.totalNumberOfRequests - 1)
           log.info(s"Done sending data (100%)...; Last one: ${item._2}")

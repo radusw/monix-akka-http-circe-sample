@@ -95,7 +95,7 @@ lazy val dockerSettings = Seq(
   dockerUpdateLatest := true,
   defaultLinuxInstallLocation in Docker := "/opt/monix-akka-http-client",
   dockerCommands := Seq(
-    Cmd("FROM", "alpine:latest"),
+    Cmd("FROM", "alpine:3.5"),
     Cmd("RUN apk upgrade --update && apk add --update openjdk8-jre"),
     Cmd("ADD", "opt /opt"),
     Cmd("WORKDIR", "/opt/monix-akka-http-client"),
