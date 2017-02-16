@@ -101,7 +101,10 @@ class Handler extends Actor with ActorLogging {
           log.warning(s"${item._2}: " + response.toString)
         else if (item._2.requestNo == item._2.totalNumberOfRequests - 1)
           log.info(s"Done sending data (100%)...; Last one: ${item._2}")
-        else if (item._2.requestNo % (item._2.totalNumberOfRequests / 20) == 0) { // log every 5% progress
+        else if (
+          item._2.totalNumberOfRequests > 20 &&
+            item._2.requestNo % (item._2.totalNumberOfRequests / 20) == 0) { // log every 5% progress
+          
           val progressPercentage = item._2.requestNo * 100 / (item._2.totalNumberOfRequests - 1)
           log.info(s"Sending data ($progressPercentage%)...; Current one: ${item._2}")
         }
